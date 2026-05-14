@@ -55,7 +55,7 @@ const CODEX_PLUGIN_NOT_SELECTED_REASON = "not selected for migration";
 const CODEX_CONFIG_PATCH_MODE_RETURN = "return";
 const CODEX_PLUGIN_MANUAL_REVIEW_REASON = "manual review";
 const CODEX_PLUGIN_LOAD_WARNING =
-  "Codex plugins could not be loaded. Run the Codex migration again after onboarding.";
+  "Codex plugins could not be loaded. After onboarding, run `openclaw migrate codex`.";
 const TARGET_CODEX_MARKETPLACE_DISCOVERY_POLL_MS = 250;
 const TARGET_CODEX_MARKETPLACE_DISCOVERY_TIMEOUT_MS = 15_000;
 const TARGET_CODEX_MARKETPLACE_DISCOVERY_TIMEOUT_ENV =

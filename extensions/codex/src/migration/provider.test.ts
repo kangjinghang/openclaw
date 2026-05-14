@@ -1064,10 +1064,10 @@ describe("buildCodexMigrationProvider", () => {
       reason: "manual review",
     });
     expect(result.warnings).toContain(
-      "Codex plugins could not be loaded. Run the Codex migration again after onboarding.",
+      "Codex plugins could not be loaded. After onboarding, run `openclaw migrate codex`.",
     );
     expect(result.nextSteps).toContain(
-      "Codex plugins could not be loaded. Run the Codex migration again after onboarding.",
+      "Codex plugins could not be loaded. After onboarding, run `openclaw migrate codex`.",
     );
     expect(logger.warn).toHaveBeenCalledWith(
       expect.stringContaining("[codex-migration] openai-curated marketplace did not appear"),
