@@ -143,6 +143,7 @@ async function applyCodexPluginInstallItem(
           agentDir: resolveCodexMigrationTargets(ctx).agentDir,
           config: ctx.config,
           isolated: true,
+          logger: ctx.logger,
         }),
       appCache: defaultCodexAppInventoryCache,
       appCacheKey,
@@ -221,6 +222,7 @@ async function requestTargetCodexAppServerJson(params: {
   agentDir: string;
   config: MigrationProviderContext["config"];
   isolated?: boolean;
+  logger?: MigrationProviderContext["logger"];
 }): Promise<unknown> {
   if (params.method !== "plugin/list") {
     return await requestCodexAppServerJson(params);
@@ -234,23 +236,38 @@ async function requestTargetCodexAppServerJson(params: {
   do {
     attempt += 1;
     const remainingMs = Math.max(1, discoveryDeadline - Date.now());
+    params.logger?.warn(
+      `[codex-migration] plugin/list attempt ${attempt}: checking for openai-curated marketplace before installing Codex plugins.`,
+    );
     lastResponse = await requestCodexAppServerJson({
       ...params,
       timeoutMs: remainingMs,
     });
     if (hasOpenAiCuratedMarketplace(lastResponse)) {
+      params.logger?.warn(
+        `[codex-migration] plugin/list attempt ${attempt}: openai-curated marketplace is available; continuing Codex plugin install.`,
+      );
       return lastResponse;
     }
     if (Date.now() >= discoveryDeadline) {
+      params.logger?.warn(
+        `[codex-migration] openai-curated marketplace did not appear after ${attempt} plugin/list attempt(s) over ${discoveryTimeoutMs}ms; leaving Codex plugins for manual review.`,
+      );
       return lastResponse;
     }
     const waitMs = Math.min(
       TARGET_CODEX_MARKETPLACE_DISCOVERY_POLL_MS,
       discoveryDeadline - Date.now(),
     );
+    params.logger?.warn(
+      `[codex-migration] plugin/list attempt ${attempt}: openai-curated marketplace missing; retrying in ${waitMs}ms.`,
+    );
     await sleep(waitMs);
   } while (Date.now() < discoveryDeadline);
 
+  params.logger?.warn(
+    `[codex-migration] openai-curated marketplace did not appear before the discovery deadline; leaving Codex plugins for manual review.`,
+  );
   return lastResponse;
 }
 
